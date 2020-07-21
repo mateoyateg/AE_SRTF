@@ -45,7 +45,7 @@ public class Principal {
         ventana.add(PaBloqueados);
         
         ventana.setSize(1280, 900);
-        ventana.setTitle("Algoritmo de Planificacion Round Robin");
+        ventana.setTitle("Algoritmo de Planificacion SRTF");
         
         ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         ventana.setLocationRelativeTo(null);
@@ -55,7 +55,4 @@ public class Principal {
         
         
     }
-    
-    
-    
 }
