@@ -40,7 +40,7 @@ public class GUI implements ActionListener {
     JButton btIniciar, btAgregar, btBloquear, btDesbloquear;
     DefaultTableModel modelTbInfo, modelTbGant, modelTbBloqueados;
     JScrollPane spTablaInfo;
-    int personaActual;
+    //int personaActual;
     int fila = 0;
     boolean clienteInicial = true;
     int posicion = 0;
@@ -372,6 +372,9 @@ public class GUI implements ActionListener {
                                 personaActual.espera++;
                             }
                         }
+                        
+                        modelTbGant.removeRow(modelTbGant.getRowCount() - 1);
+                        modelTbGant.addRow(dataGantt);
 
                         dataAuxInfo[5] = personaActual.fin;
                         dataAuxInfo[6] = personaActual.retorno;
@@ -379,10 +382,7 @@ public class GUI implements ActionListener {
 
                         modelTbInfo.removeRow(modelTbInfo.getRowCount() - 1);
                         modelTbInfo.addRow(dataAuxInfo);
-
-                        modelTbGant.removeRow(modelTbGant.getRowCount() - 1);
-                        modelTbGant.addRow(dataGantt);
-
+                        
                         System.out.println("------------------------");
                         System.out.println("Resumen de: " + personaActual.nombre);
                         System.out.println("Llegada en: " + personaActual.llegada);
@@ -455,7 +455,7 @@ public class GUI implements ActionListener {
             System.out.println("Llego un nuevo cliente");
 
             //Se le asigna una rafaga y un nombre aleatorio
-            int nuevoClientRagafa = aleatorio.nextInt(5) + 1;
+            int nuevoClientRagafa = aleatorio.nextInt(7) + 5;
             //int nuevoClientNombre = ;
 
             //int nuevoClientNombre = aleatorio.nextInt(nombres.length);
@@ -488,18 +488,40 @@ public class GUI implements ActionListener {
                     
                     if (tiempo > 0){
                         nombreAux = nombreAux + " EX";
-                    }
-                    
-                    clientes.insert(clientes.Cabecera.prioridad, tiempo, clientes.Cabecera.rafagaRestante, nombreAux, clientes.Cabecera.fila,
-                             clientes.Cabecera.rafagaRestante, clientes.Cabecera.tiempoBloqueo, clientes.Cabecera.rafagaEjecutada, tiempo);
-                    
-                    dataAuxInfo[5] = tiempo;
-                    dataAuxInfo[6] = tiempo - clientes.Cabecera.llegada;
-                    dataAuxInfo[7] = (tiempo - clientes.Cabecera.llegada) - (clientes.Cabecera.rafaga - clientes.Cabecera.rafagaRestante);
+                        dataAuxInfo[5] = tiempo;
+                        dataAuxInfo[6] = tiempo - clientes.Cabecera.llegada;
+                        dataAuxInfo[7] = (tiempo - clientes.Cabecera.llegada) - (clientes.Cabecera.rafagaEjecutada);
 
-                    modelTbInfo.removeRow(modelTbInfo.getRowCount() - 1);
-                    modelTbInfo.addRow(dataAuxInfo);
-                    
+                        modelTbInfo.removeRow(modelTbInfo.getRowCount() - 1);
+                        modelTbInfo.addRow(dataAuxInfo);
+                        
+                        Node personaActual = clientes.Cabecera;
+
+                        for (int u = personaActual.llegada + 1; u < personaActual.comienzo + 1; u++) {
+                            dataGantt[u] = "∞";
+                        }
+
+                        /*for (int u = personaActual.llegada + 1; u < personaActual.comienzo + 1; u++) {
+                                dataGantt[u] = "∞";
+                            }*/
+                        // JOptionPane.showMessageDialog(null, personaActual.espera);
+                        if (personaActual.tiempoBloqueo != 0) {
+                            for (int u = personaActual.tiempoBloqueo + 1; u < personaActual.llegada + 1; u++) {
+                                dataGantt[u] = "B";
+                                personaActual.espera++;
+                            }
+                        }
+
+                        modelTbGant.removeRow(modelTbGant.getRowCount() - 1);
+                        modelTbGant.addRow(dataGantt);
+                        
+                    } else {
+                        
+                    }
+                                        
+                    clientes.insert(clientes.Cabecera.prioridad, clientes.Cabecera.llegada, clientes.Cabecera.rafagaRestante, nombreAux, clientes.Cabecera.fila,
+                            clientes.Cabecera.rafagaRestante, clientes.Cabecera.tiempoBloqueo, clientes.Cabecera.rafagaEjecutada, tiempo);
+                                        
                     clientes.extraer(1);
                     organizarCola();
                     clientes = clientes2;
@@ -515,8 +537,19 @@ public class GUI implements ActionListener {
 
                 clientesBloqueados.insert(clientes.Cabecera.prioridad, clientes.Cabecera.llegada, clientes.Cabecera.rafaga, clientes.Cabecera.nombre, clientes.Cabecera.fila, clientes.Cabecera.comienzo + clientes.Cabecera.rafaga - tiempo, tiempo, 0, clientes.Cabecera.tfPrecursor);
                 JOptionPane.showMessageDialog(null, "El proceso en ejecucion sera bloqueado");
-
+                
                 Node aux = clientesBloqueados.Cabecera;
+                
+                Node personaActual = clientes.Cabecera;
+                
+                for (int u = personaActual.tfPrecursor + 1; u < personaActual.comienzo + 1; u++) {
+                    dataGantt[u] = "∞";
+                }
+
+                modelTbGant.removeRow(modelTbGant.getRowCount() - 1);
+                modelTbGant.addRow(dataGantt);
+
+                
 
                 while (aux.fila != clientes.Cabecera.fila) {
                     aux = aux.next;
@@ -545,6 +578,8 @@ public class GUI implements ActionListener {
                 dataBloqueados[5] = tiempo;
                 //aux.rafagaRestante = aux.comienzo + aux.rafaga - tiempo;
                 dataBloqueados[6] = aux.rafagaRestante;
+                
+                
 
                 modelTbBloqueados.addRow(dataBloqueados);
 
@@ -557,8 +592,45 @@ public class GUI implements ActionListener {
             } else {
                 clientes.insert(clientesBloqueados.Cabecera.prioridad, tiempo, clientesBloqueados.Cabecera.rafagaRestante, clientesBloqueados.Cabecera.nombre + " - (D)", clientesBloqueados.Cabecera.fila, 0, clientesBloqueados.Cabecera.tiempoBloqueo, clientesBloqueados.Cabecera.rafagaEjecutada, tiempo);
                 clientesBloqueados.extraer(1);
-
                 modelTbBloqueados.removeRow(1);
+                
+                //Organizar cola
+                organizarCola();
+                clientes = clientes2;
+                clientes2 = new Cola();
+
+                if (clientes.longitud() > 1) {
+                    System.out.println("Rafaga restante: " + clientes.Cabecera.rafagaRestante + " Nombre cabecera: " + clientes.Cabecera.nombre
+                            + " Rafaga siguente nueva: " + clientes.Cabecera.next.rafaga + "Nombre siguiente: " + clientes.Cabecera.next.nombre);
+                    
+                    if (clientes.Cabecera.rafagaRestante > clientes.Cabecera.next.rafaga) {
+                        System.out.println("Llego un proceso con una rafaga menor");
+                        String nombreAux = clientes.Cabecera.nombre;
+
+                        if (tiempo > 0) {
+                            nombreAux = nombreAux + " EX";
+                        }
+
+                        clientes.insert(clientes.Cabecera.prioridad, clientes.Cabecera.llegada, clientes.Cabecera.rafagaRestante, nombreAux, clientes.Cabecera.fila,
+                                clientes.Cabecera.rafagaRestante, clientes.Cabecera.tiempoBloqueo, clientes.Cabecera.rafagaEjecutada, tiempo);
+
+                        dataAuxInfo[5] = tiempo;
+                        dataAuxInfo[6] = tiempo - clientes.Cabecera.llegada;
+                        dataAuxInfo[7] = (tiempo - clientes.Cabecera.llegada) - (clientes.Cabecera.rafagaEjecutada);
+
+                        modelTbInfo.removeRow(modelTbInfo.getRowCount() - 1);
+                        modelTbInfo.addRow(dataAuxInfo);
+
+                        clientes.extraer(1);
+                        organizarCola();
+                        clientes = clientes2;
+                        clientes2 = new Cola();
+                        clienteInicial = true;
+                    }
+                }
+                
+                
+                
             }
         }
     }
