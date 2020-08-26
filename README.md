@@ -1,4 +1,4 @@
-# Algoritmo Expulsivo Shortes Remaining Time First
+# Algoritmo Expulsivo Shorter Remaining Time First
  Programa que permite realizar la simulacion del algoritmo de planificación expulsivo SRTF.
 
 *Nota: Ejecutar en NetBeans.*
